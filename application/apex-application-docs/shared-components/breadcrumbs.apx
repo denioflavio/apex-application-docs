@@ -1,0 +1,48 @@
+breadcrumb breadcrumb (
+    name: Breadcrumb
+
+    entry applications (
+        name: Applications
+        pageNumber: 1
+        execution {
+            sequence: 10
+        }
+        link {
+            target: {
+                page: 1
+            }
+        }
+    )
+
+    entry application (
+        name: Application
+        pageNumber: 10
+        execution {
+            sequence: 100
+        }
+        link {
+            target: {
+                page: 10
+            }
+        }
+        appearance {
+            parentEntry: @applications
+        }
+    )
+
+    entry page (
+        name: Page
+        pageNumber: 20
+        execution {
+            sequence: 200
+        }
+        link {
+            target: {
+                page: 20
+            }
+        }
+        appearance {
+            parentEntry: @application
+        }
+    )
+)

@@ -1,0 +1,295 @@
+page 10 (
+    name: Application
+    alias: APPLICATION
+    title: Application
+    appearance {
+        pageMode: normal
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    security {
+        authentication: required
+        authorizationScheme: @owner-access
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+        browserCache: false
+    }
+    help {
+        helpText: Inspect the current declared application definition. Use the report search to locate a component. Code is displayed, never executed. Coverage excludes recursive package bodies and full shared-component documentation.
+    }
+    comments {
+        comments: Application documentation and Markdown export.
+    }
+
+    region breadcrumb (
+        name: Application
+        type: breadcrumb
+        source {
+            breadcrumb: @breadcrumb
+        }
+        layout {
+            sequence: 10
+            slot: breadcrumbBar
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: #DEFAULT#
+        }
+        componentAppearance {
+            breadcrumbTemplate: @/breadcrumb
+        }
+    )
+    pageItem P10_APP_ID (
+        type: hidden
+        layout {
+            sequence: 10
+            slot: body
+        }
+        sessionState {
+            dataType: varchar2
+            storage: session
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+        help {
+            helpText: Server-validated navigation context. This identifier never grants access by itself.
+        }
+    )
+    region application-summary (
+        name: Application summary
+        type: dynamicContent
+        source {
+            plsqlFunctionBody:
+            ```plsql
+            return afd_ui.application_summary(:P10_APP_ID);
+            ```
+        }
+        layout {
+            sequence: 20
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: afd-application-summary
+        }
+        comments {
+            comments: Read-only composed surface. Metadata access and escaping are handled by the AFD packages.
+        }
+    )
+    region pages (
+        name: Pages
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+            ```sql
+            select application_id, page_id, name, type_name, description
+              from table(afd_metadata.page_list(:P10_APP_ID))
+             order by page_id
+            ```
+            pageItemsToSubmit: [ P10_APP_ID ]
+        }
+        layout {
+            sequence: 30
+            slot: body
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: afd-pages
+        }
+        messages {
+            whenNoDataFound: No supported metadata found for this selection.
+        }
+        download {
+            formats: csv
+        }
+        detailView {
+            show: false
+        }
+
+        link {
+            linkColumn: customTarget
+            linkIcon: Open
+            target: {
+                page: 20
+                clearCache: 20
+                items: {
+                    P20_APP_ID: #APPLICATION_ID#
+                    P20_PAGE_ID: #PAGE_ID#
+                }
+            }
+        }
+
+        column APPLICATION_ID (
+            type: hidden
+            heading {
+                heading: Application ID
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: NUMBER
+            }
+            security {
+                escapeSpecialChars: true
+            }
+        )
+
+        column PAGE_ID (
+            type: plainText
+            heading {
+                heading: Page
+                alignment: start
+            }
+            layout {
+                sequence: 20
+                columnAlignment: start
+            }
+            source {
+                dataType: NUMBER
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Page; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Installation-local identifier.
+                    ```
+            }
+        )
+
+        column NAME (
+            type: plainText
+            heading {
+                heading: Page name
+                alignment: start
+            }
+            layout {
+                sequence: 30
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Page name; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: Yes; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        column TYPE_NAME (
+            type: plainText
+            heading {
+                heading: Mode
+                alignment: start
+            }
+            layout {
+                sequence: 40
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Mode; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        column DESCRIPTION (
+            type: plainText
+            heading {
+                heading: Developer notes
+                alignment: start
+            }
+            layout {
+                sequence: 50
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Developer notes; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 25
+            }
+        )
+    )
+    button download-markdown (
+        buttonName: DOWNLOAD_MARKDOWN
+        label: Export Markdown
+        layout {
+            sequence: 10
+            region: @breadcrumb
+            slot: next
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: submitPage
+            executeValidations: true
+        }
+    )
+    process download-markdown (
+        name: Download Markdown
+        type: executeCode
+        source {
+            language: plsql
+            plsqlCode:
+            ```plsql
+            afd_ui.download_markdown(:P10_APP_ID);
+            ```
+        }
+        execution {
+            sequence: 10
+            point: afterSubmit
+        }
+        serverSideCondition {
+            whenButtonPressed: @download-markdown
+        }
+        security {
+            authorizationScheme: @owner-access
+        }
+        comments {
+            comments: Revalidates owner and workspace/application scope before collecting the JSON model and downloading UTF-8 Markdown.
+        }
+    )
+)

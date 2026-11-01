@@ -1,0 +1,242 @@
+page 1 (
+    name: Applications
+    alias: APPLICATIONS
+    title: Applications
+    appearance {
+        pageMode: normal
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    security {
+        authentication: required
+        authorizationScheme: @owner-access
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+        browserCache: false
+    }
+    help {
+        helpText: Inspect the current declared application definition. Use the report search to locate a component. Code is displayed, never executed. Coverage excludes recursive package bodies and full shared-component documentation.
+    }
+    comments {
+        comments: Choose a workspace application to explore its current definition.
+    }
+
+    region breadcrumb (
+        name: Applications
+        type: breadcrumb
+        source {
+            breadcrumb: @breadcrumb
+        }
+        layout {
+            sequence: 10
+            slot: breadcrumbBar
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: #DEFAULT#
+        }
+        componentAppearance {
+            breadcrumbTemplate: @/breadcrumb
+        }
+    )
+    region welcome (
+        name: Welcome
+        type: dynamicContent
+        source {
+            plsqlFunctionBody:
+            ```plsql
+            return afd_ui.hero;
+            ```
+        }
+        layout {
+            sequence: 20
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: afd-welcome
+        }
+        comments {
+            comments: Read-only composed surface. Metadata access and escaping are handled by the AFD packages.
+        }
+    )
+    region applications (
+        name: Applications
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+            ```sql
+            select application_id, name, type_name, component_count, description
+              from table(afd_metadata.application_list)
+             order by name, application_id
+            ```
+        }
+        layout {
+            sequence: 30
+            slot: body
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: afd-applications
+        }
+        messages {
+            whenNoDataFound: No supported metadata found for this selection.
+        }
+        download {
+            formats: csv
+        }
+        detailView {
+            show: false
+        }
+
+        link {
+            linkColumn: customTarget
+            linkIcon: Open
+            target: {
+                page: 10
+                clearCache: 10
+                items: {
+                    P10_APP_ID: #APPLICATION_ID#
+                }
+            }
+        }
+
+        column APPLICATION_ID (
+            type: plainText
+            heading {
+                heading: Application ID
+                alignment: start
+            }
+            layout {
+                sequence: 10
+                columnAlignment: start
+            }
+            source {
+                dataType: NUMBER
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Application ID; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Installation-local identifier.
+                    ```
+            }
+        )
+
+        column NAME (
+            type: plainText
+            heading {
+                heading: Application
+                alignment: start
+            }
+            layout {
+                sequence: 20
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Application; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: Yes; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        column TYPE_NAME (
+            type: plainText
+            heading {
+                heading: Parsing schema
+                alignment: start
+            }
+            layout {
+                sequence: 30
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Parsing schema; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        column COMPONENT_COUNT (
+            type: plainText
+            heading {
+                heading: Pages
+                alignment: start
+            }
+            layout {
+                sequence: 40
+                columnAlignment: start
+            }
+            source {
+                dataType: NUMBER
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Pages; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Installation-local identifier.
+                    ```
+            }
+        )
+
+        column DESCRIPTION (
+            type: plainText
+            heading {
+                heading: Developer notes
+                alignment: start
+            }
+            layout {
+                sequence: 50
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Developer notes; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 25
+            }
+        )
+    )
+)

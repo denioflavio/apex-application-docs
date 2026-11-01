@@ -1,0 +1,13 @@
+authorization owner-access (
+    name: Documentation owner
+    type: plSqlFunctionBody
+    settings {
+        plsqlFunctionBody: return afd_metadata.is_allowed;
+    }
+    advanced {
+        evaluationType: always
+    }
+    error {
+        errorMessage: This tool is restricted to its configured documentation owner.
+    }
+)

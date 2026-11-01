@@ -1,0 +1,1 @@
+-- No automatic deinstallation. See database/uninstall.sql for explicit removal.

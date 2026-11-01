@@ -1,0 +1,110 @@
+page 30 (
+    name: Component
+    alias: COMPONENT
+    title: Component
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/drawer
+        templateOptions: [
+            #DEFAULT#
+            js-dialog-class-t-Drawer--pullOutEnd
+        ]
+    }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    security {
+        authentication: required
+        authorizationScheme: @owner-access
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+        browserCache: false
+    }
+    help {
+        helpText: Inspect the current declared application definition. Use the report search to locate a component. Code is displayed, never executed. Coverage excludes recursive package bodies and full shared-component documentation.
+    }
+    comments {
+        comments: Read-only component definition with provenance, explicit references, source and declarative attributes.
+    }
+    dialog {
+        width: 860
+        height: auto
+        chained: false
+    }
+
+    pageItem P30_APP_ID (
+        type: hidden
+        layout {
+            sequence: 10
+            slot: contentBody
+        }
+        sessionState {
+            dataType: varchar2
+            storage: session
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+        help {
+            helpText: Server-validated navigation context. This identifier never grants access by itself.
+        }
+    )
+    pageItem P30_PAGE_ID (
+        type: hidden
+        layout {
+            sequence: 20
+            slot: contentBody
+        }
+        sessionState {
+            dataType: varchar2
+            storage: session
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+        help {
+            helpText: Server-validated navigation context. This identifier never grants access by itself.
+        }
+    )
+    pageItem P30_KEY (
+        type: hidden
+        layout {
+            sequence: 30
+            slot: contentBody
+        }
+        sessionState {
+            dataType: varchar2
+            storage: session
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+        help {
+            helpText: Server-validated navigation context. This identifier never grants access by itself.
+        }
+    )
+    region component (
+        name: Component
+        type: dynamicContent
+        source {
+            plsqlFunctionBody:
+            ```plsql
+            return afd_ui.component_detail(:P30_APP_ID,:P30_PAGE_ID,:P30_KEY);
+            ```
+        }
+        layout {
+            sequence: 10
+            slot: contentBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: afd-component
+        }
+        comments {
+            comments: Read-only composed surface. Metadata access and escaping are handled by the AFD packages.
+        }
+    )
+)

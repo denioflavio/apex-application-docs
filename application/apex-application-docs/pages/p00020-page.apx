@@ -1,0 +1,329 @@
+page 20 (
+    name: Page
+    alias: PAGE
+    title: Page
+    appearance {
+        pageMode: normal
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    security {
+        authentication: required
+        authorizationScheme: @owner-access
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+        browserCache: false
+    }
+    help {
+        helpText: Inspect the current declared application definition. Use the report search to locate a component. Code is displayed, never executed. Coverage excludes recursive package bodies and full shared-component documentation.
+    }
+    comments {
+        comments: Review the components and declared execution context on a selected page.
+    }
+
+    region breadcrumb (
+        name: Page
+        type: breadcrumb
+        source {
+            breadcrumb: @breadcrumb
+        }
+        layout {
+            sequence: 10
+            slot: breadcrumbBar
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: #DEFAULT#
+        }
+        componentAppearance {
+            breadcrumbTemplate: @/breadcrumb
+        }
+    )
+    pageItem P20_APP_ID (
+        type: hidden
+        layout {
+            sequence: 10
+            slot: body
+        }
+        sessionState {
+            dataType: varchar2
+            storage: session
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+        help {
+            helpText: Server-validated navigation context. This identifier never grants access by itself.
+        }
+    )
+    pageItem P20_PAGE_ID (
+        type: hidden
+        layout {
+            sequence: 20
+            slot: body
+        }
+        sessionState {
+            dataType: varchar2
+            storage: session
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+        help {
+            helpText: Server-validated navigation context. This identifier never grants access by itself.
+        }
+    )
+    region page-summary (
+        name: Page summary
+        type: dynamicContent
+        source {
+            plsqlFunctionBody:
+            ```plsql
+            return afd_ui.page_summary(:P20_APP_ID,:P20_PAGE_ID);
+            ```
+        }
+        layout {
+            sequence: 20
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: afd-page-summary
+        }
+        comments {
+            comments: Read-only composed surface. Metadata access and escaping are handled by the AFD packages.
+        }
+    )
+    region components (
+        name: Components
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+            ```sql
+            select application_id, page_id, component_key, family, name, type_name, description
+              from table(afd_metadata.component_list(:P20_APP_ID,:P20_PAGE_ID))
+             order by family, sort_order nulls last, component_key
+            ```
+            pageItemsToSubmit: [ P20_APP_ID P20_PAGE_ID ]
+        }
+        layout {
+            sequence: 30
+            slot: body
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: afd-components
+        }
+        messages {
+            whenNoDataFound: No supported metadata found for this selection.
+        }
+        download {
+            formats: csv
+        }
+        detailView {
+            show: false
+        }
+
+        link {
+            linkColumn: customTarget
+            linkIcon: Open
+            target: {
+                page: 30
+                clearCache: 30
+                items: {
+                    P30_APP_ID: #APPLICATION_ID#
+                    P30_PAGE_ID: #PAGE_ID#
+                    P30_KEY: #COMPONENT_KEY#
+                }
+            }
+        }
+
+        column APPLICATION_ID (
+            type: hidden
+            heading {
+                heading: Application ID
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: NUMBER
+            }
+            security {
+                escapeSpecialChars: true
+            }
+        )
+
+        column PAGE_ID (
+            type: hidden
+            heading {
+                heading: Page
+            }
+            layout {
+                sequence: 20
+            }
+            source {
+                dataType: NUMBER
+            }
+            security {
+                escapeSpecialChars: true
+            }
+        )
+
+        column COMPONENT_KEY (
+            type: hidden
+            heading {
+                heading: Component key
+            }
+            layout {
+                sequence: 30
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+        )
+
+        column FAMILY (
+            type: plainText
+            heading {
+                heading: Family
+                alignment: start
+            }
+            layout {
+                sequence: 40
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Family; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        column NAME (
+            type: plainText
+            heading {
+                heading: Component
+                alignment: start
+            }
+            layout {
+                sequence: 50
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Component; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: Yes; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        column TYPE_NAME (
+            type: plainText
+            heading {
+                heading: Source representation
+                alignment: start
+            }
+            layout {
+                sequence: 60
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Source representation; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        column DESCRIPTION (
+            type: plainText
+            heading {
+                heading: Developer notes
+                alignment: start
+            }
+            layout {
+                sequence: 70
+                columnAlignment: start
+            }
+            source {
+                dataType: STRING
+            }
+            security {
+                escapeSpecialChars: true
+            }
+            comments {
+                comments:
+                    ```
+                    Display Label: Developer notes; Display in Report: Yes; Display in Form: No; Format Mask: None; Value Required: No; Read Only: Yes; Primary Display Column: No; Authorization Scheme: owner-access. Extracted from the documented metadata model.
+                    ```
+            }
+        )
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 25
+            }
+        )
+    )
+    dynamicAction drawer-closed (
+        name: Refresh after component drawer closes
+        execution {
+            sequence: 10
+            eventScope: dynamic
+        }
+        when {
+            event: apexafterclosedialog
+            selectionType: region
+            region: @components
+        }
+
+        action refresh-components (
+            name: Refresh components
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @components
+            }
+            execution {
+                sequence: 10
+                fireWhenEventResultIs: true
+                fireOnInit: false
+            }
+        )
+    )
+)

@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "name": "YOUR_WORKSPACE"
+  },
+  "application": {
+    "id": 108,
+    "schema": "YOUR_SCHEMA"
+  }
+}
