@@ -11,6 +11,12 @@ The catalog reads public APEX views. It keeps page/component identity, developer
 - One UTF-8 Markdown document per application, including shared authorization definitions.
 - A versioned internal JSON model that can later support contextual code explanations.
 
+## Screenshots
+
+![Application overview and page inventory](docs/images/02-application.jpg)
+
+![Component drawer with source and provenance](docs/images/04-component.jpg)
+
 ## Requirements
 
 Oracle Database with the installed APEX runtime, an APEX workspace/parsing schema, SQLcl with `apex validate` and `apex import`, and permission to create the supporting table/packages in that schema.
@@ -49,7 +55,7 @@ No metadata snapshots, generated explanations or model credentials are stored. A
 
 ## Validation status
 
-Strict structure formatting, compiler-truth audit and live APEXLang compilation passed on APEX 26.1.6. The database suite passed 23 checks, covering direct-view counts, declarative Invoke API processes, authorization and membership failures, deterministic Markdown, Unicode, HTML-like labels, embedded backticks, empty pages and an 80 KB source fixture.
+Strict structure formatting, compiler-truth audit and live APEXLang compilation passed on APEX 26.1.6. The database suite passed 34 checks, covering direct-view counts, declarative Invoke API processes, authorization and membership failures, deterministic Markdown, Unicode, HTML-like labels, embedded backticks, empty pages and an 80 KB source fixture.
 
 Installation of the APEX app and browser acceptance are recorded separately in [docs/compatibility.md](docs/compatibility.md). A successful compile is not a browser acceptance result.
 

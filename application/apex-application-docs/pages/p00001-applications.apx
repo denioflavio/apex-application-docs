@@ -90,6 +90,12 @@ page 1 (
         advanced {
             htmlDomId: afd-applications
         }
+        searchBar {
+            includeSearchBar: true
+            searchField: true
+            finderDropDown: true
+            searchButtonLabel: Search
+        }
         messages {
             whenNoDataFound: No supported metadata found for this selection.
         }
@@ -102,7 +108,10 @@ page 1 (
 
         link {
             linkColumn: customTarget
-            linkIcon: Open
+            linkIcon:
+                ```
+                <span class="fa fa-arrow-right" aria-hidden="true"></span><span class="u-VisuallyHidden">Open definition</span>
+                ```
             target: {
                 page: 10
                 clearCache: 10
@@ -237,6 +246,21 @@ page 1 (
             view {
                 rowsPerPage: 25
             }
+            displayColumn APPLICATION_ID (
+                sequence: 10
+            )
+            displayColumn NAME (
+                sequence: 20
+            )
+            displayColumn TYPE_NAME (
+                sequence: 30
+            )
+            displayColumn COMPONENT_COUNT (
+                sequence: 40
+            )
+            displayColumn DESCRIPTION (
+                sequence: 50
+            )
         )
     )
 )

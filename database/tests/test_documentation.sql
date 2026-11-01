@@ -47,6 +47,11 @@ begin
                 assert_true(props.get('ATTRIBUTES').is_object,'JSON attributes remain structured');
                 found_declarative := true;
             end if;
+            if props.get_string('PROCESS_TYPE_PLUGIN_STATIC_ID')='NATIVE_SESSION_STATE' then
+                sources := n.get_array('sources');
+                src := treat(sources.get(0) as json_object_t);
+                assert_true(src.get_string('language')='text','declarative cache source is not mislabeled PL/SQL');
+            end if;
         end if;
     end loop;
     assert_true(found_declarative,'declarative process fixture found');

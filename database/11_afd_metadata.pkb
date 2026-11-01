@@ -70,7 +70,7 @@ create or replace package body afd_metadata as
                 props := json_object_t.parse(raw_json);
                 node := json_object_t();
                 identifier := props.get_string(p_id);
-                node.put('key', p_family || ':' || identifier);
+                node.put('key', p_family || '-' || identifier);
                 node.put('id', identifier);
                 node.put('family', p_family);
                 node.put('name', props.get_string(p_name));
@@ -91,7 +91,7 @@ create or replace package body afd_metadata as
                         src := json_object_t();
                         src.put('column', key_name);
                         src.put('language', case
-                            when p_family = 'process' then lower(nvl(props.get_string('PROCESS_SOURCE_LANGUAGE'),'plsql'))
+                            when p_family = 'process' then lower(nvl(props.get_string('PROCESS_SOURCE_LANGUAGE'),case when props.get_string('PROCESS_TYPE_PLUGIN_STATIC_ID')='NATIVE_PLSQL' then 'plsql' else 'text' end))
                             when p_family = 'region' and props.get_string('SOURCE_TYPE_PLUGIN_STATIC_ID') in ('NATIVE_IR','NATIVE_SQL_REPORT','NATIVE_IG') then 'sql'
                             when p_family = 'region' and props.get_string('SOURCE_TYPE_PLUGIN_STATIC_ID') = 'NATIVE_DYNAMIC_CONTENT' then 'plsql'
                             else 'text' end);
@@ -107,6 +107,7 @@ create or replace package body afd_metadata as
                     end if;
                 end if;
                 kind := case when srcs.get_size > 0 then 'textual'
+                    when p_sources is null then 'declarative'
                     when props.has('ATTRIBUTES') and not props.get('ATTRIBUTES').is_null then 'declarative'
                     else 'notProvided' end;
                 node.put('sourceKind', kind);
@@ -116,7 +117,7 @@ create or replace package body afd_metadata as
                 for i in 1 .. keys.count loop
                     key_name := keys(i);
                     if (key_name like '%\_ID' escape '\' or key_name in ('ASSOCIATED_ITEM','WHEN_ELEMENT','AFFECTED_ELEMENTS','AJAX_ITEMS_TO_SUBMIT'))
-                       and key_name not in (p_id,'APPLICATION_ID','PAGE_ID')
+                       and key_name not in (p_id,nvl(p_static,'STATIC_ID'),'STATIC_ID','APPLICATION_ID','PAGE_ID')
                        and not props.get(key_name).is_null then
                         ref_obj := json_object_t();
                         ref_obj.put('property', key_name);

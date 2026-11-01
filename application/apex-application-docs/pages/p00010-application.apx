@@ -10,6 +10,9 @@ page 10 (
     navigation {
         warnOnUnsavedChanges: false
     }
+    advanced {
+        reloadOnSubmit: always
+    }
     security {
         authentication: required
         authorizationScheme: @owner-access
@@ -21,7 +24,7 @@ page 10 (
         helpText: Inspect the current declared application definition. Use the report search to locate a component. Code is displayed, never executed. Coverage excludes recursive package bodies and full shared-component documentation.
     }
     comments {
-        comments: Application documentation and Markdown export.
+        comments: "Browse the selected application, inspect page definitions and export the same collected metadata as UTF-8 Markdown. The export checks owner and workspace access again before returning source code."
     }
 
     region breadcrumb (
@@ -95,7 +98,9 @@ page 10 (
               from table(afd_metadata.page_list(:P10_APP_ID))
              order by page_id
             ```
-            pageItemsToSubmit: [ P10_APP_ID ]
+            pageItemsToSubmit: [
+                P10_APP_ID
+            ]
         }
         layout {
             sequence: 30
@@ -107,6 +112,12 @@ page 10 (
         }
         advanced {
             htmlDomId: afd-pages
+        }
+        searchBar {
+            includeSearchBar: true
+            searchField: true
+            finderDropDown: true
+            searchButtonLabel: Search
         }
         messages {
             whenNoDataFound: No supported metadata found for this selection.
@@ -120,7 +131,10 @@ page 10 (
 
         link {
             linkColumn: customTarget
-            linkIcon: Open
+            linkIcon:
+                ```
+                <span class="fa fa-arrow-right" aria-hidden="true"></span><span class="u-VisuallyHidden">Open definition</span>
+                ```
             target: {
                 page: 20
                 clearCache: 20
@@ -248,6 +262,18 @@ page 10 (
             view {
                 rowsPerPage: 25
             }
+            displayColumn PAGE_ID (
+                sequence: 10
+            )
+            displayColumn NAME (
+                sequence: 20
+            )
+            displayColumn TYPE_NAME (
+                sequence: 30
+            )
+            displayColumn DESCRIPTION (
+                sequence: 40
+            )
         )
     )
     button download-markdown (

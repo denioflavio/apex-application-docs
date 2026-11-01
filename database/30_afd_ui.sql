@@ -9,7 +9,7 @@ end afd_ui;
 create or replace package body afd_ui as
     procedure append_escaped(p_result in out nocopy clob,p_text clob) is
         offset_value pls_integer := 1;
-        chunk varchar2(4000);
+        chunk varchar2(32767);
     begin
         while offset_value <= nvl(dbms_lob.getlength(p_text),0) loop
             chunk := dbms_lob.substr(p_text,4000,offset_value);
@@ -117,13 +117,12 @@ create or replace package body afd_ui as
         dbms_lob.createtemporary(file_data,true);
         dbms_lob.converttoblob(file_data,text_data,dbms_lob.lobmaxsize,dest_offset,src_offset,nls_charset_id('AL32UTF8'),context_value,warning_value);
         if warning_value != 0 then raise_application_error(-20007,'UTF-8 conversion failed.'); end if;
-        owa_util.mime_header('text/markdown; charset=utf-8',false);
-        htp.p('Content-Disposition: attachment; filename="application-' || to_char(p_application_id,'FM99999999999999999990') || '.md"');
-        htp.p('Content-Length: ' || dbms_lob.getlength(file_data));
-        htp.p('Cache-Control: private, no-store');
-        owa_util.http_header_close;
-        wpg_docload.download_file(file_data);
-        apex_application.stop_apex_engine;
+        apex_http.download(
+            p_blob => file_data,
+            p_content_type => 'text/markdown; charset=UTF-8',
+            p_filename => 'application-' || to_char(p_application_id,'FM99999999999999999990') || '.md',
+            p_is_inline => false);
+
     end;
 end afd_ui;
 /

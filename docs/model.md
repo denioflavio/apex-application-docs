@@ -9,9 +9,9 @@
 - `components`: objects in a fixed family order and page/sequence/ID order.
 - `coverage`, `limitations`: explicit boundaries of extraction.
 
-Each component contains `key` (`family:installation-local-id`), `id`, `family`, `name`, optional `pageId`, optional `staticId`/`sequence`, `comment`, `origin` (view/idColumn), `properties`, `sources` and `references`.
+Each component contains `key` (`family-installation-local-id`), `id`, `family`, `name`, optional `pageId`, optional `staticId`/`sequence`, `comment`, `origin` (view/idColumn), `properties`, `sources` and `references`.
 
-`sourceKind` is `textual` when configured textual source columns are populated; otherwise `declarative` when JSON attributes are present, or `notProvided`. It describes the extracted representation, not whether a component can execute behavior. JSON attributes can themselves contain code; they remain available in the declarative properties. Empty textual source never means "this component does nothing".
+`sourceKind` is `textual` when configured textual source columns are populated; otherwise `declarative` for families defined without a textual source column or when JSON attributes are present, or `notProvided`. It describes the extracted representation, not whether a component can execute behavior. JSON attributes can themselves contain code; they remain available in the declarative properties. Empty textual source never means "this component does nothing".
 
 Sources preserve source column, language where known and complete text. Unknown languages remain `text`. SQL source is never executed to infer its result. References retain exact property/value and `kind: declared`; unresolved external references remain references.
 
